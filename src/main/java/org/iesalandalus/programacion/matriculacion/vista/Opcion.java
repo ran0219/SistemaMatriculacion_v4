@@ -1,5 +1,7 @@
 package org.iesalandalus.programacion.matriculacion.vista;
 
+import org.iesalandalus.programacion.matriculacion.controlador.Controlador;
+
 public enum Opcion {
     INSERTAR_ALUMNO("Insertar alumno"),
     BUSCAR_ALUMNO("Buscar alumno"),
@@ -31,5 +33,8 @@ public enum Opcion {
     @Override
     public String toString() {
         return ordinal() + " .- " + mensaje;
+    }
+
+    public void ejecutar(Controlador controlador) {
     }
 }

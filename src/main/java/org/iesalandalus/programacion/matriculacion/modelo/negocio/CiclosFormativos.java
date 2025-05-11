@@ -1,11 +1,16 @@
-package org.iesalandalus.programacion.matriculacion.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
-import org.iesalandalus.programacion.matriculacion.dominio.CicloFormativo;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
 
 public class CiclosFormativos {
 
     private CicloFormativo[] ciclosFormativos;
     private int cantidadCiclos;
+    private Object[] coleccion;
+
+    public CiclosFormativos() {
+        coleccion = new Object[100];
+    }
 
     public CiclosFormativos(int capacidad) {
         this.ciclosFormativos = new CicloFormativo[capacidad];

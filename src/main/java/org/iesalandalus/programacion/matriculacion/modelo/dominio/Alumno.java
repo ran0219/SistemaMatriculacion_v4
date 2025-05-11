@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.matriculacion.dominio;
+package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +7,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Alumno {
+
+    private static final int MAX_ALUMNOS = 100;
+    private Alumno[] alumnos;
+    private int numAlumnos;
+
+    public void Alumnos() {
+        alumnos = new Alumno[MAX_ALUMNOS];
+        numAlumnos = 0;
+    }
 
     private String nombre;
     private String telefono;

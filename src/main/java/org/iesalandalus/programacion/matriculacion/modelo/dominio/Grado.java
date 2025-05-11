@@ -1,12 +1,13 @@
-package org.iesalandalus.programacion.matriculacion.dominio;
+package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
-public enum Curso {
-    PRIMERO("Primero"),
-    SEGUNDO("Segundo");
+public enum Grado {
+    BASICO("Grado Básico"),
+    MEDIO("Grado Medio"),
+    SUPERIOR("Grado Superior");
 
     private String cadenaAMostrar;
 
-    Curso(String cadenaAMostrar) {
+    Grado(String cadenaAMostrar) {
         this.cadenaAMostrar = cadenaAMostrar;
     }
 

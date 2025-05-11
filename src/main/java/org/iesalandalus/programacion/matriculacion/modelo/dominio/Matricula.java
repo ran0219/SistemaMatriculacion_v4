@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.matriculacion.dominio;
+package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class Matricula {
 
+    private final Alumno alumno;
+    private List<Asignatura> listaAsignaturas = List.of();
     private int identificador;
     private String cursoAcademico;
     private LocalDate fechaMatricula;
@@ -18,7 +20,9 @@ public class Matricula {
     public static final int MAX_DIAS_RETRASO_MATRICULA = 15;
     public static final int MAX_MESES_ANULACION_MATRICULA = 6;
 
-    public Matricula(int identificador, String cursoAcademico, LocalDate fechaMatricula, List<Asignatura> asignaturas) {
+    public Matricula(int identificador, String cursoAcademico, LocalDate fechaMatricula, List<Asignatura> asignaturas, Alumno alumno, List<Asignatura> listaAsignaturas) {
+        this.alumno = alumno;
+        this.listaAsignaturas = listaAsignaturas;
         setIdentificador(identificador);
         setCursoAcademico(cursoAcademico);
         setFechaMatricula(fechaMatricula);
@@ -26,9 +30,48 @@ public class Matricula {
         this.fechaAnulacion = null;
     }
 
-    public Matricula(Matricula matricula) {
-        this(matricula.identificador, matricula.cursoAcademico, matricula.fechaMatricula, matricula.asignaturas);
+    public Matricula(Alumno alumno, List<Asignatura> listaAsignaturas, Matricula matricula) {
+        this(matricula.identificador, matricula.cursoAcademico, matricula.fechaMatricula, matricula.asignaturas, alumno, listaAsignaturas);
         this.fechaAnulacion = matricula.fechaAnulacion;
+    }
+
+    public Matricula(int identificador, String cursoAcademico, LocalDate fechaMatricula, Alumno alumno, List<Asignatura> listaAsignaturas) {
+        this.identificador = identificador;
+        this.cursoAcademico = cursoAcademico;
+        this.fechaMatricula = fechaMatricula;
+        this.alumno = alumno;
+        this.listaAsignaturas = listaAsignaturas;
+    }
+
+    public Matricula(Matricula matricula) {
+        if (matricula == null) {
+            throw new NullPointerException("ERROR: No es posible copiar una matrícula nula.");
+        }
+
+        this.identificador = matricula.identificador;
+        this.cursoAcademico = matricula.cursoAcademico;
+        this.fechaMatricula = matricula.fechaMatricula;
+        this.alumno = new Alumno(matricula.alumno); // Suponiendo que Alumno tiene constructor copia
+        this.listaAsignaturas = new ArrayList<>();
+        for (Asignatura asignatura : matricula.listaAsignaturas) {
+            this.listaAsignaturas.add(new Asignatura(asignatura)); // Suponiendo que Asignatura también tiene constructor copia
+        }
+    }
+
+    public <E> Matricula(int identificador, String cursoFicticio, LocalDate now, List<E> asignaturaPorCodigo) {
+        if (listaAsignaturas == null || listaAsignaturas.isEmpty()) {
+            throw new IllegalArgumentException("ERROR: La lista de asignaturas no puede ser nula ni estar vacía.");
+        }
+
+        this.identificador = identificador;
+        this.cursoAcademico = cursoAcademico;
+        this.fechaMatricula = fechaMatricula;
+        this.listaAsignaturas = new ArrayList<>();
+        for (Asignatura asignatura : listaAsignaturas) {
+            this.listaAsignaturas.add(new Asignatura(asignatura));
+        }
+
+        this.alumno = null;
     }
 
     public int getIdentificador() {

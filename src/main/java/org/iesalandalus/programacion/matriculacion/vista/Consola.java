@@ -1,8 +1,6 @@
 package org.iesalandalus.programacion.matriculacion.vista;
 
-import org.iesalandalus.programacion.matriculacion.dominio.*;
-import org.iesalandalus.programacion.matriculacion.negocio.Asignaturas;
-import org.iesalandalus.programacion.matriculacion.negocio.CiclosFormativos;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,8 +13,7 @@ public class Consola {
 
     public static Scanner scanner = new Scanner(System.in);
 
-    private Consola() {
-    }
+    private Consola() {}
 
     public static void mostrarMenu() {
         for (Opcion opcion : Opcion.values()) {
@@ -90,9 +87,12 @@ public class Consola {
         return new CicloFormativo(identificador, familiaProfesional, grado, nombre, horas);
     }
 
-    public static void mostrarCiclosFormativos(CiclosFormativos ciclos) {
-        for (CicloFormativo ciclo : ciclos.get()) {
-            System.out.println(ciclo.imprimir());
+    public static void mostrarCiclosFormativos() {
+        Iterable<? extends CicloFormativo> ciclos = null;
+        for (CicloFormativo ciclo : ciclos) {
+            if (ciclo != null) {
+                System.out.println(ciclo.imprimir());
+            }
         }
     }
 
@@ -148,37 +148,54 @@ public class Consola {
         return new Asignatura(identificador, "Asignatura ficticia", 100, 2, Curso.PRIMERO, EspecialidadProfesorado.INFORMATICA, getCicloFormativoPorCodigo());
     }
 
-    public static void mostrarAsignaturas(Asignaturas asignaturas) {
-        for (Asignatura asignatura : asignaturas.get()) {
-            System.out.println(asignatura.imprimir());
-        }
-    }
 
-    public static boolean asignaturaYaMatriculada(List<Asignatura> asignaturasMatriculadas, Asignatura asignatura) {
-        return asignaturasMatriculadas.contains(asignatura);
-    }
-
-    public static Matricula leerMatricula() {
-        System.out.println("Introduce el identificador de la matrícula:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Introduce el curso académico de la matrícula:");
-        String cursoAcademico = scanner.nextLine();
-        LocalDate fechaMatricula = leerFecha("Introduce la fecha de matrícula (dd/MM/yyyy):");
-        List<Asignatura> asignaturasMatriculadas = new ArrayList<>();
-        boolean continuar = true;
-        while (continuar) {
-            Asignatura asignatura = getAsignaturaPorCodigo();
-            if (!asignaturaYaMatriculada(asignaturasMatriculadas, asignatura)) {
-                asignaturasMatriculadas.add(asignatura);
-                System.out.println("¿Deseas añadir otra asignatura? (s/n)");
-                String respuesta = scanner.nextLine();
-                continuar = respuesta.equalsIgnoreCase("s");
-            } else {
-                System.out.println("La asignatura ya está matriculada. Inténtalo de nuevo.");
+    public static void mostrarAsignaturas(Asignatura[] asignaturas) {
+        for (Asignatura asignatura : asignaturas) {
+            if (asignatura != null) {
+                System.out.println(asignatura.imprimir());
             }
         }
-        return new Matricula(identificador, cursoAcademico, fechaMatricula, asignaturasMatriculadas);
+    }
+
+    public static Asignatura[] elegirAsignaturasMatricula(Asignatura[] disponibles) {
+        mostrarAsignaturas(disponibles);
+        List<Asignatura> seleccionadas = new ArrayList<>();
+        String codigo;
+        do {
+            System.out.print("Introduce el identificador de la asignatura a añadir (deja vacío para terminar): ");
+            codigo = scanner.nextLine().trim();
+            if (!codigo.isEmpty()) {
+                try {
+                    int id = Integer.parseInt(codigo);
+                    for (Asignatura asignatura : disponibles) {
+                        if (asignatura != null && asignatura.getIdentificador() == id && !seleccionadas.contains(asignatura)) {
+                            seleccionadas.add(asignatura);
+                            System.out.println("Asignatura añadida.");
+                            break;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Identificador no válido.");
+                }
+            }
+        } while (!codigo.isEmpty());
+        return seleccionadas.toArray(new Asignatura[0]);
+    }
+
+    public static Matricula leerMatricula(Alumno alumno, Asignatura[] asignaturas) {
+        System.out.print("Introduce el identificador de la matrícula: ");
+        int identificador = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Introduce el curso académico: ");
+        String cursoAcademico = scanner.nextLine();
+        LocalDate fechaMatricula = leerFecha("Introduce la fecha de matrícula (dd/MM/yyyy):");
+
+        List<Asignatura> listaAsignaturas = new ArrayList<>();
+        for (Asignatura asignatura : asignaturas) {
+            listaAsignaturas.add(asignatura);
+        }
+
+        return new Matricula(identificador, cursoAcademico, fechaMatricula, alumno, listaAsignaturas);
     }
 
     public static Matricula getMatriculaPorIdentificador() {
@@ -186,5 +203,40 @@ public class Consola {
         int identificador = scanner.nextInt();
         scanner.nextLine();
         return new Matricula(identificador, "Curso ficticio", LocalDate.now(), List.of(getAsignaturaPorCodigo()));
+    }
+
+    public static boolean asignaturaYaMatriculada(List<Asignatura> asignaturasMatriculadas, Asignatura asignatura) {
+        return asignaturasMatriculadas.contains(asignatura);
+    }
+
+    // Métodos vacíos o no modificados
+    public static void insertarAlumno() {}
+    public static void buscarAlumno() {}
+    public static void borrarAlumno() {}
+    public static void despedir() {}
+    public static void mostrarMatriculasPorCursoAcademico() {}
+    public static void mostrarMatriculasPorCicloFormativo() {}
+    public static void mostrarMatriculasPorAlumno() {}
+    public static void mostrarMatriculas() {}
+    public static void anularMatricula() {}
+    public static void buscarMatricula() {}
+    public static void insertarMatricula() {}
+    public static void borrarCicloFormativo() {}
+    public static void buscarCicloFormativo() {}
+    public static void insertarCicloFormativo() {}
+    public static void buscarAsignatura() {}
+    public static void borrarAsignatura() {}
+    public static void insertarAsignatura() {}
+    public static void mostrarAlumnos() {}
+
+    public static void mostrarAsignaturas() {
+        Asignatura[] asignaturas = new Asignatura[0];
+        if (asignaturas == null || asignaturas.length == 0) {
+            System.out.println("No hay asignaturas disponibles.");
+        } else {
+            for (Asignatura asignatura : asignaturas) {
+                System.out.println(asignatura.imprimir());
+            }
+        }
     }
 }

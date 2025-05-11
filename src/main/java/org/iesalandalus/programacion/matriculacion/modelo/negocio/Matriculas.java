@@ -1,9 +1,9 @@
-package org.iesalandalus.programacion.matriculacion.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
-import org.iesalandalus.programacion.matriculacion.dominio.Alumno;
-import org.iesalandalus.programacion.matriculacion.dominio.Asignatura;
-import org.iesalandalus.programacion.matriculacion.dominio.CicloFormativo;
-import org.iesalandalus.programacion.matriculacion.dominio.Matricula;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.Alumno;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.Matricula;
 
 import java.util.Arrays;
 
@@ -11,6 +11,11 @@ public class Matriculas {
 
     private Matricula[] matriculas;
     private int cantidadMatriculas;
+    private Object[] coleccion;
+
+    public Matriculas() {
+        coleccion = new Object[100];
+    }
 
     public Matriculas(int capacidad) {
         this.matriculas = new Matricula[capacidad];

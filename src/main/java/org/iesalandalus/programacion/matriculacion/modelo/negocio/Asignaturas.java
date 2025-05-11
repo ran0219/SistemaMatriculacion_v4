@@ -1,6 +1,6 @@
-package org.iesalandalus.programacion.matriculacion.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
-import org.iesalandalus.programacion.matriculacion.dominio.Asignatura;
+import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
 
 public class Asignaturas {
 
@@ -10,6 +10,12 @@ public class Asignaturas {
     public Asignaturas(int capacidad) {
         this.asignaturas = new Asignatura[capacidad];
         this.cantidadAsignaturas = 0;
+    }
+
+    private Object[] coleccion;
+
+    public Asignaturas() {
+        coleccion = new Object[100];
     }
 
     public Asignatura[] get() {
