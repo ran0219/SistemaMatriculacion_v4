@@ -1,130 +1,87 @@
 package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
+import java.util.Objects;
+
+/**
+ * Clase que representa una asignatura en el sistema.
+ */
 public class Asignatura {
-
-    private int identificador;
+    private String codigo;
     private String nombre;
-    private int horasAnuales;
-    private int horasDesdoble;
-    private Curso curso;
-    private EspecialidadProfesorado especialidadProfesorado;
-    private CicloFormativo cicloFormativo;
+    private int creditos;
 
-    public static final int MIN_IDENTIFICADOR = 1000;
-    public static final int MAX_IDENTIFICADOR = 9999;
-    public static final int MAX_HORAS_ANUALES = 300;
-    public static final int MAX_HORAS_DESDOBLE = 6;
-
-    public Asignatura(int identificador, String nombre, int horasAnuales, int horasDesdoble, Curso curso, EspecialidadProfesorado especialidadProfesorado, CicloFormativo cicloFormativo) {
-        setIdentificador(identificador);
-        setNombre(nombre);
-        setHorasAnuales(horasAnuales);
-        setHorasDesdoble(horasDesdoble);
-        setCurso(curso);
-        setEspecialidadProfesorado(especialidadProfesorado);
-        setCicloFormativo(cicloFormativo);
-    }
-
-    public Asignatura(Asignatura asignatura) {
-        this(asignatura.identificador, asignatura.nombre, asignatura.horasAnuales, asignatura.horasDesdoble, asignatura.curso, asignatura.especialidadProfesorado, asignatura.cicloFormativo);
-    }
-
-    public int getIdentificador() {
-        return identificador;
-    }
-
-    public void setIdentificador(int identificador) {
-        if (identificador < MIN_IDENTIFICADOR || identificador > MAX_IDENTIFICADOR) {
-            throw new IllegalArgumentException("El identificador debe estar entre 1000 y 9999.");
+    /**
+     * Constructor para crear un nuevo objeto Asignatura.
+     * @param codigo El código único de la asignatura.
+     * @param nombre El nombre de la asignatura.
+     * @param creditos El número de créditos de la asignatura.
+     */
+    public Asignatura(String codigo, String nombre, int creditos) {
+        if (codigo == null || nombre == null || creditos <= 0) {
+            throw new IllegalArgumentException("Código y nombre de asignatura no pueden ser nulos/vacíos y créditos deben ser positivos.");
         }
-        this.identificador = identificador;
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.creditos = creditos;
+    }
+
+    // --- Getters ---
+    public String getCodigo() {
+        return codigo;
     }
 
     public String getNombre() {
         return nombre;
     }
 
+    public int getCreditos() {
+        return creditos;
+    }
+
+    // --- Setters ---
+    // Generalmente, el código no debería ser modificable.
     public void setNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+            throw new IllegalArgumentException("El nombre no puede ser nulo o vacío.");
         }
         this.nombre = nombre;
     }
 
-    public int getHorasAnuales() {
-        return horasAnuales;
-    }
-
-    public void setHorasAnuales(int horasAnuales) {
-        if (horasAnuales <= 0 || horasAnuales > MAX_HORAS_ANUALES) {
-            throw new IllegalArgumentException("Las horas anuales deben estar entre 1 y " + MAX_HORAS_ANUALES + ".");
+    public void setCreditos(int creditos) {
+        if (creditos <= 0) {
+            throw new IllegalArgumentException("Los créditos deben ser un valor positivo.");
         }
-        this.horasAnuales = horasAnuales;
+        this.creditos = creditos;
     }
 
-    public int getHorasDesdoble() {
-        return horasDesdoble;
-    }
-
-    public void setHorasDesdoble(int horasDesdoble) {
-        if (horasDesdoble < 0 || horasDesdoble > MAX_HORAS_DESDOBLE) {
-            throw new IllegalArgumentException("Las horas de desdoble deben estar entre 0 y " + MAX_HORAS_DESDOBLE + ".");
-        }
-        this.horasDesdoble = horasDesdoble;
-    }
-
-    public Curso getCurso() {
-        return curso;
-    }
-
-    public void setCurso(Curso curso) {
-        if (curso == null) {
-            throw new IllegalArgumentException("El curso no puede ser nulo.");
-        }
-        this.curso = curso;
-    }
-
-    public EspecialidadProfesorado getEspecialidadProfesorado() {
-        return especialidadProfesorado;
-    }
-
-    public void setEspecialidadProfesorado(EspecialidadProfesorado especialidadProfesorado) {
-        if (especialidadProfesorado == null) {
-            throw new IllegalArgumentException("La especialidad del profesorado no puede ser nula.");
-        }
-        this.especialidadProfesorado = especialidadProfesorado;
-    }
-
-    public CicloFormativo getCicloFormativo() {
-        return cicloFormativo;
-    }
-
-    public void setCicloFormativo(CicloFormativo cicloFormativo) {
-        if (cicloFormativo == null) {
-            throw new IllegalArgumentException("El ciclo formativo no puede ser nulo.");
-        }
-        this.cicloFormativo = cicloFormativo;
-    }
-
+    /**
+     * Compara dos objetos Asignatura por su código.
+     * @param o El objeto a comparar.
+     * @return true si los códigos son iguales, false en caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Asignatura that = (Asignatura) o;
-        return identificador == that.identificador;
+        return Objects.equals(codigo, that.codigo); // Las asignaturas son iguales si tienen el mismo código
     }
 
+    /**
+     * Genera un código hash basado en el código de la asignatura.
+     * @return El código hash.
+     */
     @Override
     public int hashCode() {
-        return identificador;
+        return Objects.hash(codigo);
     }
 
+    /**
+     * Devuelve una representación en cadena del objeto Asignatura.
+     * @return String con la información de la asignatura.
+     */
     @Override
     public String toString() {
-        return String.format("%04d, %s, %d, %d, %s, %s, %s", identificador, nombre, horasAnuales, horasDesdoble, curso, especialidadProfesorado, cicloFormativo);
-    }
-
-    public String imprimir() {
-        return toString();
+        return "Asignatura [Código: " + codigo + ", Nombre: " + nombre + ", Créditos: " + creditos + "]";
     }
 }

@@ -1,242 +1,95 @@
 package org.iesalandalus.programacion.matriculacion.vista;
 
-import org.iesalandalus.programacion.matriculacion.modelo.dominio.*;
+import org.iesalandalus.programacion.matriculacion.controlador.Controlador;
+import org.iesalandalus.programacion.matriculacion.modelo.Modelo;
 
+// Archivo: Consola.java
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Consola {
+    private Scanner scanner;
 
-    public static Scanner scanner = new Scanner(System.in);
-
-    private Consola() {}
-
-    public static void mostrarMenu() {
-        for (Opcion opcion : Opcion.values()) {
-            System.out.println(opcion);
-        }
+    public Consola() {
+        this.scanner = new Scanner(System.in);
     }
 
-    public static Opcion elegirOpcion() {
-        int opcionElegida = scanner.nextInt();
-        scanner.nextLine();
-        return Opcion.values()[opcionElegida];
+    /**
+     * Lee una cadena de texto desde la consola.
+     * @param mensaje El mensaje a mostrar al usuario.
+     * @return La cadena de texto introducida por el usuario.
+     */
+    public String leerCadena(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
     }
 
-    public static Alumno leerAlumno() {
-        System.out.println("Introduce el nombre del alumno:");
-        String nombre = scanner.nextLine();
-        System.out.println("Introduce el teléfono del alumno:");
-        String telefono = scanner.nextLine();
-        System.out.println("Introduce el email del alumno:");
-        String email = scanner.nextLine();
-        System.out.println("Introduce el DNI del alumno:");
-        String dni = scanner.nextLine();
-        LocalDate fechaNacimiento = leerFecha("Introduce la fecha de nacimiento del alumno (dd/MM/yyyy):");
-        return new Alumno(nombre, telefono, email, dni, fechaNacimiento);
-    }
-
-    public static Alumno getAlumnoPorDni() {
-        System.out.println("Introduce el DNI del alumno:");
-        String dni = scanner.nextLine();
-        return new Alumno("Nombre ficticio", "123456789", "email@ficticio.com", dni, LocalDate.now().minusYears(18));
-    }
-
-    public static LocalDate leerFecha(String mensaje) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Alumno.FORMATO_FECHA);
-        LocalDate fecha = null;
-        boolean fechaValida = false;
-        while (!fechaValida) {
+    /**
+     * Lee un número entero desde la consola, con validación de entrada.
+     * @param mensaje El mensaje a mostrar al usuario.
+     * @return El número entero introducido por el usuario.
+     */
+    public int leerEntero(String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
             try {
-                System.out.println(mensaje);
-                fecha = LocalDate.parse(scanner.nextLine(), formatter);
-                fechaValida = true;
+                int valor = scanner.nextInt();
+                scanner.nextLine(); // Consumir el salto de línea
+                return valor;
+            } catch (InputMismatchException e) {
+                System.err.println("Error: Por favor, introduzca un número entero válido.");
+                scanner.nextLine(); // Limpiar el buffer del scanner
+            }
+        }
+    }
+
+    /**
+     * Lee un número double desde la consola, con validación de entrada.
+     * Permite introducir "null" para un valor nulo (útil para notas, etc.).
+     * @param mensaje El mensaje a mostrar al usuario.
+     * @return El número double introducido, o null si el usuario introduce "null".
+     */
+    public Double leerDouble(String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("null") || input.isEmpty()) {
+                return null;
+            }
+            try {
+                return Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.err.println("Error: Por favor, introduzca un número decimal válido o 'null'.");
+            }
+        }
+    }
+
+    /**
+     * Lee una fecha en formato AAAA-MM-DD desde la consola, con validación.
+     * @param mensaje El mensaje a mostrar al usuario.
+     * @return Un objeto LocalDate.
+     */
+    public LocalDate leerFecha(String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+            String fechaStr = scanner.nextLine();
+            try {
+                return LocalDate.parse(fechaStr);
             } catch (DateTimeParseException e) {
-                System.out.println("Formato de fecha incorrecto. Inténtalo de nuevo.");
-            }
-        }
-        return fecha;
-    }
-
-    public static Grado leerGrado() {
-        System.out.println("Elige el grado:");
-        for (Grado grado : Grado.values()) {
-            System.out.println(grado.imprimir());
-        }
-        int opcion = scanner.nextInt();
-        scanner.nextLine();
-        return Grado.values()[opcion];
-    }
-
-    public static CicloFormativo leerCicloFormativo() {
-        System.out.println("Introduce el identificador del ciclo formativo:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Introduce la familia profesional del ciclo formativo:");
-        String familiaProfesional = scanner.nextLine();
-        Grado grado = leerGrado();
-        System.out.println("Introduce el nombre del ciclo formativo:");
-        String nombre = scanner.nextLine();
-        System.out.println("Introduce el número de horas del ciclo formativo:");
-        int horas = scanner.nextInt();
-        scanner.nextLine();
-        return new CicloFormativo(identificador, familiaProfesional, grado, nombre, horas);
-    }
-
-    public static void mostrarCiclosFormativos() {
-        Iterable<? extends CicloFormativo> ciclos = null;
-        for (CicloFormativo ciclo : ciclos) {
-            if (ciclo != null) {
-                System.out.println(ciclo.imprimir());
+                System.err.println("Error: Formato de fecha incorrecto. Use AAAA-MM-DD.");
             }
         }
     }
 
-    public static CicloFormativo getCicloFormativoPorCodigo() {
-        System.out.println("Introduce el identificador del ciclo formativo:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        return new CicloFormativo(identificador, "Familia ficticia", Grado.MEDIO, "Ciclo ficticio", 1000);
-    }
-
-    public static Curso leerCurso() {
-        System.out.println("Elige el curso:");
-        for (Curso curso : Curso.values()) {
-            System.out.println(curso.imprimir());
-        }
-        int opcion = scanner.nextInt();
-        scanner.nextLine();
-        return Curso.values()[opcion];
-    }
-
-    public static EspecialidadProfesorado leerEspecialidadProfesorado() {
-        System.out.println("Elige la especialidad del profesorado:");
-        for (EspecialidadProfesorado especialidad : EspecialidadProfesorado.values()) {
-            System.out.println(especialidad.imprimir());
-        }
-        int opcion = scanner.nextInt();
-        scanner.nextLine();
-        return EspecialidadProfesorado.values()[opcion];
-    }
-
-    public static Asignatura leerAsignatura() {
-        System.out.println("Introduce el identificador de la asignatura:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Introduce el nombre de la asignatura:");
-        String nombre = scanner.nextLine();
-        System.out.println("Introduce el número de horas anuales de la asignatura:");
-        int horasAnuales = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Introduce el número de horas de desdoble de la asignatura:");
-        int horasDesdoble = scanner.nextInt();
-        scanner.nextLine();
-        Curso curso = leerCurso();
-        EspecialidadProfesorado especialidadProfesorado = leerEspecialidadProfesorado();
-        CicloFormativo cicloFormativo = getCicloFormativoPorCodigo();
-        return new Asignatura(identificador, nombre, horasAnuales, horasDesdoble, curso, especialidadProfesorado, cicloFormativo);
-    }
-
-    public static Asignatura getAsignaturaPorCodigo() {
-        System.out.println("Introduce el identificador de la asignatura:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        return new Asignatura(identificador, "Asignatura ficticia", 100, 2, Curso.PRIMERO, EspecialidadProfesorado.INFORMATICA, getCicloFormativoPorCodigo());
-    }
-
-
-    public static void mostrarAsignaturas(Asignatura[] asignaturas) {
-        for (Asignatura asignatura : asignaturas) {
-            if (asignatura != null) {
-                System.out.println(asignatura.imprimir());
-            }
-        }
-    }
-
-    public static Asignatura[] elegirAsignaturasMatricula(Asignatura[] disponibles) {
-        mostrarAsignaturas(disponibles);
-        List<Asignatura> seleccionadas = new ArrayList<>();
-        String codigo;
-        do {
-            System.out.print("Introduce el identificador de la asignatura a añadir (deja vacío para terminar): ");
-            codigo = scanner.nextLine().trim();
-            if (!codigo.isEmpty()) {
-                try {
-                    int id = Integer.parseInt(codigo);
-                    for (Asignatura asignatura : disponibles) {
-                        if (asignatura != null && asignatura.getIdentificador() == id && !seleccionadas.contains(asignatura)) {
-                            seleccionadas.add(asignatura);
-                            System.out.println("Asignatura añadida.");
-                            break;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Identificador no válido.");
-                }
-            }
-        } while (!codigo.isEmpty());
-        return seleccionadas.toArray(new Asignatura[0]);
-    }
-
-    public static Matricula leerMatricula(Alumno alumno, Asignatura[] asignaturas) {
-        System.out.print("Introduce el identificador de la matrícula: ");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Introduce el curso académico: ");
-        String cursoAcademico = scanner.nextLine();
-        LocalDate fechaMatricula = leerFecha("Introduce la fecha de matrícula (dd/MM/yyyy):");
-
-        List<Asignatura> listaAsignaturas = new ArrayList<>();
-        for (Asignatura asignatura : asignaturas) {
-            listaAsignaturas.add(asignatura);
-        }
-
-        return new Matricula(identificador, cursoAcademico, fechaMatricula, alumno, listaAsignaturas);
-    }
-
-    public static Matricula getMatriculaPorIdentificador() {
-        System.out.println("Introduce el identificador de la matrícula:");
-        int identificador = scanner.nextInt();
-        scanner.nextLine();
-        return new Matricula(identificador, "Curso ficticio", LocalDate.now(), List.of(getAsignaturaPorCodigo()));
-    }
-
-    public static boolean asignaturaYaMatriculada(List<Asignatura> asignaturasMatriculadas, Asignatura asignatura) {
-        return asignaturasMatriculadas.contains(asignatura);
-    }
-
-    // Métodos vacíos o no modificados
-    public static void insertarAlumno() {}
-    public static void buscarAlumno() {}
-    public static void borrarAlumno() {}
-    public static void despedir() {}
-    public static void mostrarMatriculasPorCursoAcademico() {}
-    public static void mostrarMatriculasPorCicloFormativo() {}
-    public static void mostrarMatriculasPorAlumno() {}
-    public static void mostrarMatriculas() {}
-    public static void anularMatricula() {}
-    public static void buscarMatricula() {}
-    public static void insertarMatricula() {}
-    public static void borrarCicloFormativo() {}
-    public static void buscarCicloFormativo() {}
-    public static void insertarCicloFormativo() {}
-    public static void buscarAsignatura() {}
-    public static void borrarAsignatura() {}
-    public static void insertarAsignatura() {}
-    public static void mostrarAlumnos() {}
-
-    public static void mostrarAsignaturas() {
-        Asignatura[] asignaturas = new Asignatura[0];
-        if (asignaturas == null || asignaturas.length == 0) {
-            System.out.println("No hay asignaturas disponibles.");
-        } else {
-            for (Asignatura asignatura : asignaturas) {
-                System.out.println(asignatura.imprimir());
-            }
+    /**
+     * Cierra el objeto Scanner para liberar los recursos del sistema.
+     * Es crucial llamarlo al finalizar la aplicación.
+     */
+    public void cerrarScanner() {
+        if (scanner != null) {
+            scanner.close();
         }
     }
 }

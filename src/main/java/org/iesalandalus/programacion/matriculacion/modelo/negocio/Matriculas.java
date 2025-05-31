@@ -5,126 +5,127 @@ import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Matricula;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+/**
+ * Clase que gestiona una colección de objetos Matricula utilizando un ArrayList.
+ * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
+ */
 public class Matriculas {
+    private ArrayList<Matricula> listaMatriculas;
+    // Eliminados: atributos relacionados con capacidad fija
 
-    private Matricula[] matriculas;
-    private int cantidadMatriculas;
-    private Object[] coleccion;
-
+    /**
+     * Constructor que inicializa el ArrayList de matrículas.
+     */
     public Matriculas() {
-        coleccion = new Object[100];
+        this.listaMatriculas = new ArrayList<>();
     }
 
-    public Matriculas(int capacidad) {
-        this.matriculas = new Matricula[capacidad];
-        this.cantidadMatriculas = 0;
-    }
-
-    public Matricula[] get() {
-        return copiaProfundaMatriculas();
-    }
-
-    private Matricula[] copiaProfundaMatriculas() {
-        Matricula[] copia = new Matricula[cantidadMatriculas];
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            copia[i] = new Matricula(matriculas[i]);
+    /**
+     * Añade una matrícula a la colección. Se asegura de no añadir matrículas duplicadas (basado en ID).
+     * @param matricula El objeto Matricula a añadir.
+     * @return true si la matrícula se añadió con éxito (no existía previamente y no es nula), false en caso contrario.
+     */
+    public boolean añadirMatricula(Matricula matricula) {
+        if (matricula == null) {
+            System.err.println("Advertencia: No se puede añadir una matrícula nula.");
+            return false;
         }
-        return copia;
-    }
-
-    public void insertar(Matricula matricula) {
-        if (matricula != null && !capacidadSuperada() && buscar(matricula.getIdentificador()) == null) {
-            matriculas[cantidadMatriculas] = matricula;
-            cantidadMatriculas++;
+        if (!listaMatriculas.contains(matricula)) { // 'contains' usa el método equals de Matricula (por ID)
+            return listaMatriculas.add(matricula);
         }
+        return false; // La matrícula ya existe en la lista
     }
 
-    public Matricula buscar(int identificador) {
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            if (matriculas[i].getIdentificador() == identificador) {
-                return matriculas[i];
+    /**
+     * Busca una matrícula por su ID.
+     * @param idMatricula El ID de la matrícula a buscar.
+     * @return El objeto Matricula si se encuentra, o null si no existe.
+     */
+    public Matricula buscarMatriculaPorId(String idMatricula) {
+        if (idMatricula == null || idMatricula.trim().isEmpty()) {
+            return null; // ID no válido para buscar
+        }
+        for (Matricula matricula : listaMatriculas) {
+            if (matricula.getIdMatricula().equalsIgnoreCase(idMatricula.trim())) {
+                return matricula;
             }
         }
-        return null;
+        return null; // Matrícula no encontrada
     }
 
-    public void borrar(int identificador) {
-        int indice = buscarIndice(identificador);
-        if (indice != -1) {
-            desplazarUnaPosicionHaciaIzquierda(indice);
-            matriculas[cantidadMatriculas - 1] = null;
-            cantidadMatriculas--;
+    /**
+     * Elimina una matrícula de la colección por su ID.
+     * @param idMatricula El ID de la matrícula a eliminar.
+     * @return true si la matrícula se eliminó con éxito, false si no se encontró.
+     */
+    public boolean eliminarMatriculaPorId(String idMatricula) {
+        if (idMatricula == null || idMatricula.trim().isEmpty()) {
+            return false; // ID no válido para eliminar
         }
+        return listaMatriculas.removeIf(matricula -> matricula.getIdMatricula().equalsIgnoreCase(idMatricula.trim()));
     }
 
-    private int buscarIndice(int identificador) {
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            if (matriculas[i].getIdentificador() == identificador) {
-                return i;
+    /**
+     * Obtiene una copia de la lista de todas las matrículas.
+     * @return Un nuevo ArrayList que contiene todas las matrículas.
+     */
+    public ArrayList<Matricula> getListaMatriculas() {
+        return new ArrayList<>(listaMatriculas);
+    }
+
+    /**
+     * Retorna el número actual de matrículas en la colección.
+     * @return El tamaño del ArrayList.
+     */
+    public int getNumeroMatriculas() {
+        return listaMatriculas.size();
+    }
+
+    /**
+     * Verifica si la lista de matrículas está vacía.
+     * @return true si la lista está vacía, false en caso contrario.
+     */
+    public boolean estaVacia() {
+        return listaMatriculas.isEmpty();
+    }
+
+    /**
+     * Obtiene una lista de matrículas asociadas a un alumno específico.
+     * @param dniAlumno El DNI del alumno cuyas matrículas se desean obtener.
+     * @return Un ArrayList de Matricula que pertenecen al alumno dado.
+     */
+    public ArrayList<Matricula> getMatriculasPorAlumno(String dniAlumno) {
+        ArrayList<Matricula> matriculasAlumno = new ArrayList<>();
+        if (dniAlumno == null || dniAlumno.trim().isEmpty()) {
+            return matriculasAlumno; // DNI no válido, devuelve lista vacía
+        }
+        for (Matricula matricula : listaMatriculas) {
+            if (matricula.getAlumno() != null && matricula.getAlumno().getDni().equalsIgnoreCase(dniAlumno.trim())) {
+                matriculasAlumno.add(matricula);
             }
         }
-        return -1;
+        return matriculasAlumno;
     }
 
-    private void desplazarUnaPosicionHaciaIzquierda(int indice) {
-        for (int i = indice; i < cantidadMatriculas - 1; i++) {
-            matriculas[i] = matriculas[i + 1];
+    /**
+     * Obtiene una lista de matrículas asociadas a una asignatura específica.
+     * @param codigoAsignatura El código de la asignatura cuyas matrículas se desean obtener.
+     * @return Un ArrayList de Matricula que pertenecen a la asignatura dada.
+     */
+    public ArrayList<Matricula> getMatriculasPorAsignatura(String codigoAsignatura) {
+        ArrayList<Matricula> matriculasAsignatura = new ArrayList<>();
+        if (codigoAsignatura == null || codigoAsignatura.trim().isEmpty()) {
+            return matriculasAsignatura; // Código no válido, devuelve lista vacía
         }
-    }
-
-    public boolean capacidadSuperada() {
-        return cantidadMatriculas == matriculas.length;
-    }
-
-    public int getCantidadMatriculas() {
-        return cantidadMatriculas;
-    }
-
-    public int getTamaño() {
-        return matriculas.length;
-    }
-
-    public Matricula[] get(Alumno alumno) {
-        Matricula[] resultado = new Matricula[cantidadMatriculas];
-        int cantidadResultados = 0;
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            for (Asignatura asignatura : matriculas[i].getAsignaturas()) {
-                if (asignatura.getCicloFormativo().equals(alumno)) {
-                    resultado[cantidadResultados] = matriculas[i];
-                    cantidadResultados++;
-                    break;
-                }
+        for (Matricula matricula : listaMatriculas) {
+            if (matricula.getAsignatura() != null && matricula.getAsignatura().getCodigo().equalsIgnoreCase(codigoAsignatura.trim())) {
+                matriculasAsignatura.add(matricula);
             }
         }
-        return Arrays.copyOf(resultado, cantidadResultados);
-    }
-
-    public Matricula[] get(CicloFormativo cicloFormativo) {
-        Matricula[] resultado = new Matricula[cantidadMatriculas];
-        int cantidadResultados = 0;
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            for (Asignatura asignatura : matriculas[i].getAsignaturas()) {
-                if (asignatura.getCicloFormativo().equals(cicloFormativo)) {
-                    resultado[cantidadResultados] = matriculas[i];
-                    cantidadResultados++;
-                    break;
-                }
-            }
-        }
-        return Arrays.copyOf(resultado, cantidadResultados);
-    }
-
-    public Matricula[] get(String cursoAcademico) {
-        Matricula[] resultado = new Matricula[cantidadMatriculas];
-        int cantidadResultados = 0;
-        for (int i = 0; i < cantidadMatriculas; i++) {
-            if (matriculas[i].getCursoAcademico().equals(cursoAcademico)) {
-                resultado[cantidadResultados] = matriculas[i];
-                cantidadResultados++;
-            }
-        }
-        return Arrays.copyOf(resultado, cantidadResultados);
+        return matriculasAsignatura;
     }
 }

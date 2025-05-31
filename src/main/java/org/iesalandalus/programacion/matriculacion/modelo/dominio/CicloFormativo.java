@@ -1,103 +1,92 @@
 package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
+import java.util.Objects;
+
+/**
+ * Clase que representa un ciclo formativo (ej. Grado Superior, Grado Medio) en el sistema.
+ */
 public class CicloFormativo {
-
-    private int identificador;
-    private String familiaProfesional;
-    private Grado grado;
+    private String codigo;
     private String nombre;
-    private int horas;
+    private String nivel; // Ej: "Grado Medio", "Grado Superior"
+    private String tipo;
 
-    public static final int MIN_IDENTIFICADOR = 1000;
-    public static final int MAX_IDENTIFICADOR = 9999;
-    public static final int MAX_HORAS = 2000;
-
-    public CicloFormativo(int identificador, String familiaProfesional, Grado grado, String nombre, int horas) {
-        setIdentificador(identificador);
-        setFamiliaProfesional(familiaProfesional);
-        setGrado(grado);
-        setNombre(nombre);
-        setHoras(horas);
-    }
-
-    public CicloFormativo(CicloFormativo cicloFormativo) {
-        this(cicloFormativo.identificador, cicloFormativo.familiaProfesional, cicloFormativo.grado, cicloFormativo.nombre, cicloFormativo.horas);
-    }
-
-    public int getIdentificador() {
-        return identificador;
-    }
-
-    public void setIdentificador(int identificador) {
-        if (identificador < MIN_IDENTIFICADOR || identificador > MAX_IDENTIFICADOR) {
-            throw new IllegalArgumentException("El identificador debe estar entre 1000 y 9999.");
+    /**
+     * Constructor para crear un nuevo objeto CicloFormativo.
+     * @param codigo El código único del ciclo formativo.
+     * @param nombre El nombre del ciclo formativo.
+     * @param nivel El nivel del ciclo formativo (ej. "Grado Medio", "Grado Superior").
+     */
+    public CicloFormativo(String codigo, String nombre, String nivel) {
+        if (codigo == null || nombre == null || nivel == null) {
+            throw new IllegalArgumentException("Todos los campos del ciclo formativo deben ser no nulos.");
         }
-        this.identificador = identificador;
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.nivel = nivel;
     }
 
-    public String getFamiliaProfesional() {
-        return familiaProfesional;
-    }
-
-    public void setFamiliaProfesional(String familiaProfesional) {
-        if (familiaProfesional == null || familiaProfesional.trim().isEmpty()) {
-            throw new IllegalArgumentException("La familia profesional no puede estar vacía.");
-        }
-        this.familiaProfesional = familiaProfesional;
-    }
-
-    public Grado getGrado() {
-        return grado;
-    }
-
-    public void setGrado(Grado grado) {
-        if (grado == null) {
-            throw new IllegalArgumentException("El grado no puede ser nulo.");
-        }
-        this.grado = grado;
+    // --- Getters ---
+    public String getCodigo() {
+        return codigo;
     }
 
     public String getNombre() {
         return nombre;
     }
 
+    public String getNivel() {
+        return nivel;
+    }
+
+    // --- Setters ---
+    // Generalmente, el código no debería ser modificable.
     public void setNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío.");
+            throw new IllegalArgumentException("El nombre no puede ser nulo o vacío.");
         }
         this.nombre = nombre;
     }
 
-    public int getHoras() {
-        return horas;
-    }
-
-    public void setHoras(int horas) {
-        if (horas <= 0 || horas > MAX_HORAS) {
-            throw new IllegalArgumentException("Las horas deben estar entre 1 y " + MAX_HORAS + ".");
+    public void setNivel(String nivel) {
+        if (nivel == null || nivel.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nivel no puede ser nulo o vacío.");
         }
-        this.horas = horas;
+        this.nivel = nivel;
     }
 
+    /**
+     * Compara dos objetos CicloFormativo por su código.
+     * @param o El objeto a comparar.
+     * @return true si los códigos son iguales, false en caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CicloFormativo that = (CicloFormativo) o;
-        return identificador == that.identificador;
+        return Objects.equals(codigo, that.codigo); // Los ciclos son iguales si tienen el mismo código
     }
 
+    /**
+     * Genera un código hash basado en el código del ciclo formativo.
+     * @return El código hash.
+     */
     @Override
     public int hashCode() {
-        return identificador;
+        return Objects.hash(codigo);
     }
 
+    /**
+     * Devuelve una representación en cadena del objeto CicloFormativo.
+     * @return String con la información del ciclo formativo.
+     */
     @Override
     public String toString() {
-        return String.format("%04d, %s, %s, %s, %d", identificador, familiaProfesional, grado, nombre, horas);
+        return "CicloFormativo [Código: " + codigo + ", Nombre: " + nombre + ", Nivel: " + nivel + "]";
     }
 
-    public String imprimir() {
-        return toString();
+    public String getTipo() {
+        return tipo;
     }
 }

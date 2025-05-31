@@ -5,14 +5,10 @@ public enum Grado {
     MEDIO("Grado Medio"),
     SUPERIOR("Grado Superior");
 
-    private String cadenaAMostrar;
+    private final String cadenaAMostrar;
 
     Grado(String cadenaAMostrar) {
         this.cadenaAMostrar = cadenaAMostrar;
-    }
-
-    public String imprimir() {
-        return ordinal() + ".-" + cadenaAMostrar;
     }
 
     @Override

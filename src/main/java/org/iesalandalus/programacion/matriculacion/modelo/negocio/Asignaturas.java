@@ -2,83 +2,91 @@ package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+/**
+ * Clase que gestiona una colección de objetos Asignatura utilizando un ArrayList.
+ * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
+ */
 public class Asignaturas {
+    private ArrayList<Asignatura> listaAsignaturas;
+    // Eliminados: atributos relacionados con capacidad fija
 
-    private Asignatura[] asignaturas;
-    private int cantidadAsignaturas;
-
-    public Asignaturas(int capacidad) {
-        this.asignaturas = new Asignatura[capacidad];
-        this.cantidadAsignaturas = 0;
-    }
-
-    private Object[] coleccion;
-
+    /**
+     * Constructor que inicializa el ArrayList de asignaturas.
+     */
     public Asignaturas() {
-        coleccion = new Object[100];
+        this.listaAsignaturas = new ArrayList<>();
     }
 
-    public Asignatura[] get() {
-        return copiaProfundaAsignaturas();
-    }
-
-    private Asignatura[] copiaProfundaAsignaturas() {
-        Asignatura[] copia = new Asignatura[cantidadAsignaturas];
-        for (int i = 0; i < cantidadAsignaturas; i++) {
-            copia[i] = new Asignatura(asignaturas[i]);
+    /**
+     * Añade una asignatura a la colección. Se asegura de no añadir asignaturas duplicadas (basado en código).
+     * @param asignatura El objeto Asignatura a añadir.
+     * @return true si la asignatura se añadió con éxito (no existía previamente y no es nula), false en caso contrario.
+     */
+    public boolean añadirAsignatura(Asignatura asignatura) {
+        if (asignatura == null) {
+            System.err.println("Advertencia: No se puede añadir una asignatura nula.");
+            return false;
         }
-        return copia;
-    }
-
-    public void insertar(Asignatura asignatura) {
-        if (asignatura != null && !capacidadSuperada() && buscar(asignatura.getIdentificador()) == null) {
-            asignaturas[cantidadAsignaturas] = asignatura;
-            cantidadAsignaturas++;
+        if (!listaAsignaturas.contains(asignatura)) { // 'contains' usa el método equals de Asignatura (por código)
+            return listaAsignaturas.add(asignatura);
         }
+        return false; // La asignatura ya existe en la lista
     }
 
-    public Asignatura buscar(int identificador) {
-        for (int i = 0; i < cantidadAsignaturas; i++) {
-            if (asignaturas[i].getIdentificador() == identificador) {
-                return asignaturas[i];
+    /**
+     * Busca una asignatura por su código.
+     * @param codigo El código de la asignatura a buscar.
+     * @return El objeto Asignatura si se encuentra, o null si no existe.
+     */
+    public Asignatura buscarAsignaturaPorCodigo(String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return null; // Código no válido para buscar
+        }
+        for (Asignatura asignatura : listaAsignaturas) {
+            if (asignatura.getCodigo().equalsIgnoreCase(codigo.trim())) {
+                return asignatura;
             }
         }
-        return null;
+        return null; // Asignatura no encontrada
     }
 
-    public void borrar(int identificador) {
-        int indice = buscarIndice(identificador);
-        if (indice != -1) {
-            desplazarUnaPosicionHaciaIzquierda(indice);
-            asignaturas[cantidadAsignaturas - 1] = null;
-            cantidadAsignaturas--;
+    /**
+     * Elimina una asignatura de la colección por su código.
+     * @param codigo El código de la asignatura a eliminar.
+     * @return true si la asignatura se eliminó con éxito, false si no se encontró.
+     */
+    public boolean eliminarAsignaturaPorCodigo(String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return false; // Código no válido para eliminar
         }
+        return listaAsignaturas.removeIf(asignatura -> asignatura.getCodigo().equalsIgnoreCase(codigo.trim()));
     }
 
-    private int buscarIndice(int identificador) {
-        for (int i = 0; i < cantidadAsignaturas; i++) {
-            if (asignaturas[i].getIdentificador() == identificador) {
-                return i;
-            }
-        }
-        return -1;
+    /**
+     * Obtiene una copia de la lista de todas las asignaturas.
+     * @return Un nuevo ArrayList que contiene todas las asignaturas.
+     */
+    public ArrayList<Asignatura> getListaAsignaturas() {
+        return new ArrayList<>(listaAsignaturas);
     }
 
-    private void desplazarUnaPosicionHaciaIzquierda(int indice) {
-        for (int i = indice; i < cantidadAsignaturas - 1; i++) {
-            asignaturas[i] = asignaturas[i + 1];
-        }
+    /**
+     * Retorna el número actual de asignaturas en la colección.
+     * @return El tamaño del ArrayList.
+     */
+    public int getNumeroAsignaturas() {
+        return listaAsignaturas.size();
     }
 
-    public boolean capacidadSuperada() {
-        return cantidadAsignaturas == asignaturas.length;
-    }
-
-    public int getCantidadAsignaturas() {
-        return cantidadAsignaturas;
-    }
-
-    public int getTamaño() {
-        return asignaturas.length;
+    /**
+     * Verifica si la lista de asignaturas está vacía.
+     * @return true si la lista está vacía, false en caso contrario.
+     */
+    public boolean estaVacia() {
+        return listaAsignaturas.isEmpty();
     }
 }

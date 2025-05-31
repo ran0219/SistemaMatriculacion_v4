@@ -2,82 +2,94 @@ package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Alumno;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+/**
+ * Clase que gestiona una colección de objetos Alumno utilizando un ArrayList.
+ * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
+ */
 public class Alumnos {
+    private ArrayList<Alumno> listaAlumnos;
+    // Eliminados: private static final int CAPACIDAD;
+    // Eliminados: private int numAlumnos;
 
-    private static final int CAPACIDAD_MAXIMA = 100;
-    private Alumno[] alumnos;
-    private int numAlumnos;
-
+    /**
+     * Constructor que inicializa el ArrayList de alumnos.
+     */
     public Alumnos() {
-        alumnos = new Alumno[CAPACIDAD_MAXIMA];
-        numAlumnos = 0;
+        this.listaAlumnos = new ArrayList<>();
     }
 
-    public Alumno[] get() {
-        Alumno[] copia = new Alumno[numAlumnos];
-        for (int i = 0; i < numAlumnos; i++) {
-            copia[i] = new Alumno(alumnos[i]); // copia profunda
-        }
-        return copia;
-    }
-
-    public int getCapacidad() {
-        return CAPACIDAD_MAXIMA;
-    }
-
-    public int getCantidad() {
-        return numAlumnos;
-    }
-
-    public void insertar(Alumno alumno) {
+    /**
+     * Añade un alumno a la colección. Se asegura de no añadir alumnos duplicados (basado en DNI).
+     * @param alumno El objeto Alumno a añadir.
+     * @return true si el alumno se añadió con éxito (no existía previamente y no es nulo), false en caso contrario.
+     */
+    public boolean añadirAlumno(Alumno alumno) {
         if (alumno == null) {
-            throw new NullPointerException("No se puede insertar un alumno nulo.");
+            System.err.println("Advertencia: No se puede añadir un alumno nulo.");
+            return false;
         }
-
-        if (numAlumnos >= CAPACIDAD_MAXIMA) {
-            throw new IllegalStateException("No caben más alumnos.");
+        if (!listaAlumnos.contains(alumno)) { // 'contains' usa el método equals de Alumno (por DNI)
+            return listaAlumnos.add(alumno);
         }
-
-        if (buscar(alumno) != null) {
-            throw new IllegalArgumentException("El alumno ya existe.");
-        }
-
-        alumnos[numAlumnos++] = new Alumno(alumno); // copia defensiva
+        return false; // El alumno ya existe en la lista
     }
 
-    public Alumno buscar(Alumno alumno) {
-        if (alumno == null) {
-            throw new NullPointerException("No se puede buscar un alumno nulo.");
+    /**
+     * Busca un alumno por su DNI.
+     * @param dni El DNI del alumno a buscar.
+     * @return El objeto Alumno si se encuentra, o null si no existe.
+     */
+    public Alumno buscarAlumnoPorDni(String dni) {
+        if (dni == null || dni.trim().isEmpty()) {
+            return null; // DNI no válido para buscar
         }
-
-        for (int i = 0; i < numAlumnos; i++) {
-            if (alumnos[i].equals(alumno)) {
-                return new Alumno(alumnos[i]);
+        for (Alumno alumno : listaAlumnos) {
+            if (alumno.getDni().equalsIgnoreCase(dni.trim())) {
+                return alumno;
             }
         }
-        return null;
+        return null; // Alumno no encontrado
     }
 
-    public void borrar(Alumno alumno) {
-        if (alumno == null) {
-            throw new NullPointerException("No se puede borrar un alumno nulo.");
+    /**
+     * Elimina un alumno de la colección por su DNI.
+     * @param dni El DNI del alumno a eliminar.
+     * @return true si el alumno se eliminó con éxito, false si no se encontró.
+     */
+    public boolean eliminarAlumnoPorDni(String dni) {
+        if (dni == null || dni.trim().isEmpty()) {
+            return false; // DNI no válido para eliminar
         }
-
-        for (int i = 0; i < numAlumnos; i++) {
-            if (alumnos[i].equals(alumno)) {
-                desplazarIzquierda(i);
-                numAlumnos--;
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException("No se ha encontrado el alumno a borrar.");
+        // removeIf usa el método equals de Alumno o un predicado
+        return listaAlumnos.removeIf(alumno -> alumno.getDni().equalsIgnoreCase(dni.trim()));
     }
 
-    private void desplazarIzquierda(int indice) {
-        for (int i = indice; i < numAlumnos - 1; i++) {
-            alumnos[i] = alumnos[i + 1];
-        }
-        alumnos[numAlumnos - 1] = null;
+    /**
+     * Obtiene una copia de la lista de todos los alumnos.
+     * Devolver una copia es una buena práctica para proteger la lista interna de modificaciones externas directas.
+     * @return Un nuevo ArrayList que contiene todos los alumnos.
+     */
+    public ArrayList<Alumno> getListaAlumnos() {
+        return new ArrayList<>(listaAlumnos);
+    }
+
+    /**
+     * Retorna el número actual de alumnos en la colección.
+     * @return El tamaño del ArrayList.
+     */
+    public int getNumeroAlumnos() {
+        return listaAlumnos.size();
+    }
+
+    /**
+     * Verifica si la lista de alumnos está vacía.
+     * @return true si la lista está vacía, false en caso contrario.
+     */
+    public boolean estaVacia() {
+        return listaAlumnos.isEmpty();
     }
 }

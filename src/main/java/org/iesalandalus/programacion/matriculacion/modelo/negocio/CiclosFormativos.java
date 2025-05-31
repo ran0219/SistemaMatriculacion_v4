@@ -2,82 +2,91 @@ package org.iesalandalus.programacion.matriculacion.modelo.negocio;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+/**
+ * Clase que gestiona una colección de objetos CicloFormativo utilizando un ArrayList.
+ * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
+ */
 public class CiclosFormativos {
+    private ArrayList<CicloFormativo> listaCiclos;
+    // Eliminados: atributos relacionados con capacidad fija
 
-    private CicloFormativo[] ciclosFormativos;
-    private int cantidadCiclos;
-    private Object[] coleccion;
-
+    /**
+     * Constructor que inicializa el ArrayList de ciclos formativos.
+     */
     public CiclosFormativos() {
-        coleccion = new Object[100];
+        this.listaCiclos = new ArrayList<>();
     }
 
-    public CiclosFormativos(int capacidad) {
-        this.ciclosFormativos = new CicloFormativo[capacidad];
-        this.cantidadCiclos = 0;
-    }
-
-    public CicloFormativo[] get() {
-        return copiaProfundaCiclosFormativos();
-    }
-
-    private CicloFormativo[] copiaProfundaCiclosFormativos() {
-        CicloFormativo[] copia = new CicloFormativo[cantidadCiclos];
-        for (int i = 0; i < cantidadCiclos; i++) {
-            copia[i] = new CicloFormativo(ciclosFormativos[i]);
+    /**
+     * Añade un ciclo formativo a la colección. Se asegura de no añadir ciclos duplicados (basado en código).
+     * @param ciclo El objeto CicloFormativo a añadir.
+     * @return true si el ciclo se añadió con éxito (no existía previamente y no es nulo), false en caso contrario.
+     */
+    public boolean añadirCiclo(CicloFormativo ciclo) {
+        if (ciclo == null) {
+            System.err.println("Advertencia: No se puede añadir un ciclo formativo nulo.");
+            return false;
         }
-        return copia;
-    }
-
-    public void insertar(CicloFormativo cicloFormativo) {
-        if (cicloFormativo != null && !capacidadSuperada() && buscar(cicloFormativo.getIdentificador()) == null) {
-            ciclosFormativos[cantidadCiclos] = cicloFormativo;
-            cantidadCiclos++;
+        if (!listaCiclos.contains(ciclo)) { // 'contains' usa el método equals de CicloFormativo (por código)
+            return listaCiclos.add(ciclo);
         }
+        return false; // El ciclo ya existe en la lista
     }
 
-    public CicloFormativo buscar(int identificador) {
-        for (int i = 0; i < cantidadCiclos; i++) {
-            if (ciclosFormativos[i].getIdentificador() == identificador) {
-                return ciclosFormativos[i];
+    /**
+     * Busca un ciclo formativo por su código.
+     * @param codigo El código del ciclo formativo a buscar.
+     * @return El objeto CicloFormativo si se encuentra, o null si no existe.
+     */
+    public CicloFormativo buscarCicloPorCodigo(String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return null; // Código no válido para buscar
+        }
+        for (CicloFormativo ciclo : listaCiclos) {
+            if (ciclo.getCodigo().equalsIgnoreCase(codigo.trim())) {
+                return ciclo;
             }
         }
-        return null;
+        return null; // Ciclo formativo no encontrado
     }
 
-    public void borrar(int identificador) {
-        int indice = buscarIndice(identificador);
-        if (indice != -1) {
-            desplazarUnaPosicionHaciaIzquierda(indice);
-            ciclosFormativos[cantidadCiclos - 1] = null;
-            cantidadCiclos--;
+    /**
+     * Elimina un ciclo formativo de la colección por su código.
+     * @param codigo El código del ciclo formativo a eliminar.
+     * @return true si el ciclo se eliminó con éxito, false si no se encontró.
+     */
+    public boolean eliminarCicloPorCodigo(String codigo) {
+        if (codigo == null || codigo.trim().isEmpty()) {
+            return false; // Código no válido para eliminar
         }
+        return listaCiclos.removeIf(ciclo -> ciclo.getCodigo().equalsIgnoreCase(codigo.trim()));
     }
 
-    private int buscarIndice(int identificador) {
-        for (int i = 0; i < cantidadCiclos; i++) {
-            if (ciclosFormativos[i].getIdentificador() == identificador) {
-                return i;
-            }
-        }
-        return -1;
+    /**
+     * Obtiene una copia de la lista de todos los ciclos formativos.
+     * @return Un nuevo ArrayList que contiene todos los ciclos formativos.
+     */
+    public ArrayList<CicloFormativo> getListaCiclos() {
+        return new ArrayList<>(listaCiclos);
     }
 
-    private void desplazarUnaPosicionHaciaIzquierda(int indice) {
-        for (int i = indice; i < cantidadCiclos - 1; i++) {
-            ciclosFormativos[i] = ciclosFormativos[i + 1];
-        }
+    /**
+     * Retorna el número actual de ciclos formativos en la colección.
+     * @return El tamaño del ArrayList.
+     */
+    public int getNumeroCiclos() {
+        return listaCiclos.size();
     }
 
-    public boolean capacidadSuperada() {
-        return cantidadCiclos == ciclosFormativos.length;
-    }
-
-    public int getCantidadCiclos() {
-        return cantidadCiclos;
-    }
-
-    public int getTamaño() {
-        return ciclosFormativos.length;
+    /**
+     * Verifica si la lista de ciclos formativos está vacía.
+     * @return true si la lista está vacía, false en caso contrario.
+     */
+    public boolean estaVacia() {
+        return listaCiclos.isEmpty();
     }
 }

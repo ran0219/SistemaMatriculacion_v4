@@ -1,179 +1,111 @@
 package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
+/**
+ * Clase que representa una matrícula de un alumno en una asignatura.
+ */
 public class Matricula {
+    private final String idMatricula;
+    private final Alumno alumno; // Referencia al objeto Alumno
+    private final Asignatura asignatura; // Referencia al objeto Asignatura
+    private final LocalDate fechaMatriculacion;
+    private Double nota; // Usamos Double para permitir null si la nota no está establecida
+    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    private final Alumno alumno;
-    private List<Asignatura> listaAsignaturas = List.of();
-    private int identificador;
-    private String cursoAcademico;
-    private LocalDate fechaMatricula;
-    private LocalDate fechaAnulacion;
-    private List<Asignatura> asignaturas;
-
-    public static final int MAX_HORAS_MATRICULA = 1000;
-    public static final int MAX_ASIGNATURAS_MATRICULA = 10;
-    public static final int MAX_DIAS_RETRASO_MATRICULA = 15;
-    public static final int MAX_MESES_ANULACION_MATRICULA = 6;
-
-    public Matricula(int identificador, String cursoAcademico, LocalDate fechaMatricula, List<Asignatura> asignaturas, Alumno alumno, List<Asignatura> listaAsignaturas) {
+    /**
+     * Constructor para crear una nueva matrícula sin nota inicial.
+     * @param idMatricula El ID único de la matrícula.
+     * @param alumno El objeto Alumno matriculado.
+     * @param asignatura El objeto Asignatura en la que se matricula.
+     * @param fechaMatriculacion La fecha en que se realizó la matrícula.
+     */
+    public Matricula(String idMatricula, Alumno alumno, Asignatura asignatura, LocalDate fechaMatriculacion) {
+        if (idMatricula == null || alumno == null || asignatura == null || fechaMatriculacion == null) {
+            throw new IllegalArgumentException("El ID, alumno, asignatura y fecha de matrícula no pueden ser nulos.");
+        }
+        this.idMatricula = idMatricula;
         this.alumno = alumno;
-        this.listaAsignaturas = listaAsignaturas;
-        setIdentificador(identificador);
-        setCursoAcademico(cursoAcademico);
-        setFechaMatricula(fechaMatricula);
-        setAsignaturas(asignaturas);
-        this.fechaAnulacion = null;
+        this.asignatura = asignatura;
+        this.fechaMatriculacion = fechaMatriculacion;
+        this.nota = null; // Inicialmente sin nota
     }
 
-    public Matricula(Alumno alumno, List<Asignatura> listaAsignaturas, Matricula matricula) {
-        this(matricula.identificador, matricula.cursoAcademico, matricula.fechaMatricula, matricula.asignaturas, alumno, listaAsignaturas);
-        this.fechaAnulacion = matricula.fechaAnulacion;
+    /**
+     * Constructor para crear una nueva matrícula con nota inicial.
+     * @param idMatricula El ID único de la matrícula.
+     * @param alumno El objeto Alumno matriculado.
+     * @param asignatura El objeto Asignatura en la que se matricula.
+     * @param fechaMatriculacion La fecha en que se realizó la matrícula.
+     * @param nota La nota inicial de la matrícula (puede ser null).
+     */
+    public Matricula(String idMatricula, Alumno alumno, Asignatura asignatura, LocalDate fechaMatriculacion, Double nota) {
+        this(idMatricula, alumno, asignatura, fechaMatriculacion); // Reutiliza el constructor anterior
+        setNota(nota); // Usa el setter para la validación de nota
     }
 
-    public Matricula(int identificador, String cursoAcademico, LocalDate fechaMatricula, Alumno alumno, List<Asignatura> listaAsignaturas) {
-        this.identificador = identificador;
-        this.cursoAcademico = cursoAcademico;
-        this.fechaMatricula = fechaMatricula;
-        this.alumno = alumno;
-        this.listaAsignaturas = listaAsignaturas;
+    // --- Getters ---
+    public String getIdMatricula() {
+        return idMatricula;
     }
 
-    public Matricula(Matricula matricula) {
-        if (matricula == null) {
-            throw new NullPointerException("ERROR: No es posible copiar una matrícula nula.");
+    public Alumno getAlumno() {
+        return alumno;
+    }
+
+    public Asignatura getAsignatura() {
+        return asignatura;
+    }
+
+    public LocalDate getFechaMatriculacion() {
+        return fechaMatriculacion;
+    }
+
+    public Double getNota() {
+        return nota;
+    }
+
+    public void setNota(Double nota) {
+        if (nota != null && (nota < 0.0 || nota > 10.0)) {
+            throw new IllegalArgumentException("La nota debe estar entre 0.0 y 10.0.");
         }
-
-        this.identificador = matricula.identificador;
-        this.cursoAcademico = matricula.cursoAcademico;
-        this.fechaMatricula = matricula.fechaMatricula;
-        this.alumno = new Alumno(matricula.alumno); // Suponiendo que Alumno tiene constructor copia
-        this.listaAsignaturas = new ArrayList<>();
-        for (Asignatura asignatura : matricula.listaAsignaturas) {
-            this.listaAsignaturas.add(new Asignatura(asignatura)); // Suponiendo que Asignatura también tiene constructor copia
-        }
+        this.nota = nota;
     }
 
-    public <E> Matricula(int identificador, String cursoFicticio, LocalDate now, List<E> asignaturaPorCodigo) {
-        if (listaAsignaturas == null || listaAsignaturas.isEmpty()) {
-            throw new IllegalArgumentException("ERROR: La lista de asignaturas no puede ser nula ni estar vacía.");
-        }
-
-        this.identificador = identificador;
-        this.cursoAcademico = cursoAcademico;
-        this.fechaMatricula = fechaMatricula;
-        this.listaAsignaturas = new ArrayList<>();
-        for (Asignatura asignatura : listaAsignaturas) {
-            this.listaAsignaturas.add(new Asignatura(asignatura));
-        }
-
-        this.alumno = null;
-    }
-
-    public int getIdentificador() {
-        return identificador;
-    }
-
-    public void setIdentificador(int identificador) {
-        if (identificador < 1000 || identificador > 9999) {
-            throw new IllegalArgumentException("El identificador debe estar entre 1000 y 9999.");
-        }
-        this.identificador = identificador;
-    }
-
-    public String getCursoAcademico() {
-        return cursoAcademico;
-    }
-
-    public void setCursoAcademico(String cursoAcademico) {
-        if (cursoAcademico == null || cursoAcademico.trim().isEmpty()) {
-            throw new IllegalArgumentException("El curso académico no puede estar vacío.");
-        }
-        this.cursoAcademico = cursoAcademico;
-    }
-
-    public LocalDate getFechaMatricula() {
-        return fechaMatricula;
-    }
-
-    public void setFechaMatricula(LocalDate fechaMatricula) {
-        if (fechaMatricula == null) {
-            throw new IllegalArgumentException("La fecha de matrícula no puede ser nula.");
-        }
-        if (ChronoUnit.DAYS.between(fechaMatricula, LocalDate.now()) > MAX_DIAS_RETRASO_MATRICULA) {
-            throw new IllegalArgumentException("La fecha de matrícula no puede ser posterior a " + MAX_DIAS_RETRASO_MATRICULA + " días.");
-        }
-        this.fechaMatricula = fechaMatricula;
-    }
-
-    public LocalDate getFechaAnulacion() {
-        return fechaAnulacion;
-    }
-
-    public void setFechaAnulacion(LocalDate fechaAnulacion) {
-        if (fechaAnulacion != null && ChronoUnit.MONTHS.between(fechaMatricula, fechaAnulacion) > MAX_MESES_ANULACION_MATRICULA) {
-            throw new IllegalArgumentException("La fecha de anulación no puede ser posterior a " + MAX_MESES_ANULACION_MATRICULA + " meses.");
-        }
-        this.fechaAnulacion = fechaAnulacion;
-    }
-
-    public List<Asignatura> getAsignaturas() {
-        List<Asignatura> copia = new ArrayList<>(asignaturas.size());
-        for (Asignatura asignatura : asignaturas) {
-            copia.add(new Asignatura(asignatura));
-        }
-        return copia;
-    }
-
-    public void setAsignaturas(List<Asignatura> asignaturas) {
-        if (asignaturas == null || asignaturas.isEmpty()) {
-            throw new IllegalArgumentException("La lista de asignaturas no puede estar vacía.");
-        }
-        if (asignaturas.size() > MAX_ASIGNATURAS_MATRICULA) {
-            throw new IllegalArgumentException("No se pueden matricular más de " + MAX_ASIGNATURAS_MATRICULA + " asignaturas.");
-        }
-        this.asignaturas = asignaturas;
-    }
-
-    public boolean superaMaximoNumeroHorasMatricula() {
-        int totalHoras = 0;
-        for (Asignatura asignatura : asignaturas) {
-            totalHoras += asignatura.getHorasAnuales();
-        }
-        return totalHoras > MAX_HORAS_MATRICULA;
-    }
-
+    /**
+     * Compara dos objetos Matricula por su ID de matrícula.
+     * @param o El objeto a comparar.
+     * @return true si los ID son iguales, false en caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Matricula matricula = (Matricula) o;
-        return identificador == matricula.identificador;
+        return Objects.equals(idMatricula, matricula.idMatricula); // Las matrículas son iguales si tienen el mismo ID
     }
 
+    /**
+     * Genera un código hash basado en el ID de la matrícula.
+     * @return El código hash.
+     */
     @Override
     public int hashCode() {
-        return identificador;
+        return Objects.hash(idMatricula);
     }
 
+    /**
+     * Devuelve una representación en cadena del objeto Matrícula
+     * @return String con la información de la matrícula.
+     */
     @Override
     public String toString() {
-        return String.format("%04d, %s, %s, %s, %s", identificador, cursoAcademico, fechaMatricula, fechaAnulacion, asignaturasMatricula());
-    }
-
-    public String imprimir() {
-        return toString();
-    }
-
-    public String asignaturasMatricula() {
-        StringBuilder sb = new StringBuilder();
-        for (Asignatura asignatura : asignaturas) {
-            sb.append(asignatura.getNombre()).append(", ");
-        }
-        return sb.toString().replaceAll(", $", "");
+        return "Matricula [ID: " + idMatricula +
+                ", Alumno DNI: " + (alumno != null ? alumno.getDni() : "N/A") +
+                ", Asignatura Código: " + (asignatura != null ? asignatura.getCodigo() : "N/A") +
+                ", Fecha: " + fechaMatriculacion.format(FORMATO_FECHA) +
+                ", Nota: " + (nota != null ? String.format("%.2f", nota) : "Sin calificar") + "]";
     }
 }

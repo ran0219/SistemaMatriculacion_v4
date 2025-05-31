@@ -4,14 +4,10 @@ public enum Curso {
     PRIMERO("Primero"),
     SEGUNDO("Segundo");
 
-    private String cadenaAMostrar;
+    private final String cadenaAMostrar;
 
     Curso(String cadenaAMostrar) {
         this.cadenaAMostrar = cadenaAMostrar;
-    }
-
-    public String imprimir() {
-        return ordinal() + ".-" + cadenaAMostrar;
     }
 
     @Override
