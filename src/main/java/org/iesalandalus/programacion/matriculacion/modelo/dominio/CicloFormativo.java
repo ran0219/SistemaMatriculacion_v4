@@ -6,6 +6,8 @@ import java.util.Objects;
  * Clase que representa un ciclo formativo (ej. Grado Superior, Grado Medio) en el sistema.
  */
 public class CicloFormativo {
+    private final String cicloFormativoId;
+    private final Object duracionAnios;
     private String codigo;
     private String nombre;
     private String nivel; // Ej: "Grado Medio", "Grado Superior"
@@ -17,13 +19,27 @@ public class CicloFormativo {
      * @param nombre El nombre del ciclo formativo.
      * @param nivel El nivel del ciclo formativo (ej. "Grado Medio", "Grado Superior").
      */
-    public CicloFormativo(String codigo, String nombre, String nivel) {
+    public CicloFormativo(Object duracionAnios, String codigo, String nombre, String nivel) {
+        this.duracionAnios = duracionAnios;
         if (codigo == null || nombre == null || nivel == null) {
             throw new IllegalArgumentException("Todos los campos del ciclo formativo deben ser no nulos.");
         }
         this.codigo = codigo;
         this.nombre = nombre;
         this.nivel = nivel;
+        cicloFormativoId = "";
+    }
+
+    public CicloFormativo(String cicloFormativoId, Object nombre, int i, int i1) {
+        this.cicloFormativoId = cicloFormativoId;
+        this.nombre = nombre.toString();
+        Object duracionAnios = new Object();
+        this.duracionAnios = duracionAnios;
+    }
+
+    public CicloFormativo(String dam, String desarrolloDeAplicacionesMultiplataforma, String gradoSuperior, String cicloFormativoId, Object duracionAnios) {
+        this.cicloFormativoId = cicloFormativoId;
+        this.duracionAnios = duracionAnios;
     }
 
     // --- Getters ---
@@ -88,5 +104,21 @@ public class CicloFormativo {
 
     public String getTipo() {
         return tipo;
+    }
+
+
+    public enum TiposGrado {
+        GRADO_D("Grado D"),
+        GRADO_E("Grado E");
+
+        private String descripcion;
+
+        TiposGrado(String descripcion) {
+            this.descripcion = descripcion;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
     }
 }

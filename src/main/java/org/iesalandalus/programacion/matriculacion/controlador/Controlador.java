@@ -9,7 +9,6 @@ import org.iesalandalus.programacion.matriculacion.modelo.dominio.Alumno;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Matricula;
-import org.iesalandalus.programacion.matriculacion.modelo.negocio.Matriculas;
 
 import java.time.LocalDate; // Para manejar fechas
 import java.util.ArrayList; // Para manejar listas

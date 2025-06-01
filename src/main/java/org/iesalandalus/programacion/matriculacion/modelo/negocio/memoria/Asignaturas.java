@@ -1,16 +1,16 @@
-package org.iesalandalus.programacion.matriculacion.modelo.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.IAsignaturas;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.mysql.utilidades.MySQL;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Clase que gestiona una colección de objetos Asignatura utilizando un ArrayList.
  * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
  */
-public class Asignaturas {
+public abstract class Asignaturas implements IAsignaturas {
     private ArrayList<Asignatura> listaAsignaturas;
     // Eliminados: atributos relacionados con capacidad fija
 
@@ -88,5 +88,15 @@ public class Asignaturas {
      */
     public boolean estaVacia() {
         return listaAsignaturas.isEmpty();
+    }
+
+    @Override
+    public void comenzar() {
+        MySQL.establecerConexion(); // Necesitarás la clase MySQL
+    }
+
+    @Override
+    public void terminar() {
+        MySQL.cerrarConexion(); // Necesitarás la clase MySQL
     }
 }

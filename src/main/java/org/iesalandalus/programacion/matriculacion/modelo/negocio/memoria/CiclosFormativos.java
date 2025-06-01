@@ -1,16 +1,16 @@
-package org.iesalandalus.programacion.matriculacion.modelo.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.ICiclosFormativos;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.mysql.utilidades.MySQL;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Clase que gestiona una colección de objetos CicloFormativo utilizando un ArrayList.
  * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
  */
-public class CiclosFormativos {
+public abstract class CiclosFormativos implements ICiclosFormativos {
     private ArrayList<CicloFormativo> listaCiclos;
     // Eliminados: atributos relacionados con capacidad fija
 
@@ -88,5 +88,15 @@ public class CiclosFormativos {
      */
     public boolean estaVacia() {
         return listaCiclos.isEmpty();
+    }
+
+    @Override
+    public void comenzar() {
+        MySQL.establecerConexion(); // Necesitarás la clase MySQL
+    }
+
+    @Override
+    public void terminar() {
+        MySQL.cerrarConexion(); // Necesitarás la clase MySQL
     }
 }

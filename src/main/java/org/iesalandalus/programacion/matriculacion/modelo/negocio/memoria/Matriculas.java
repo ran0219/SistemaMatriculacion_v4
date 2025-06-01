@@ -1,19 +1,16 @@
-package org.iesalandalus.programacion.matriculacion.modelo.negocio;
+package org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria;
 
-import org.iesalandalus.programacion.matriculacion.modelo.dominio.Alumno;
-import org.iesalandalus.programacion.matriculacion.modelo.dominio.Asignatura;
-import org.iesalandalus.programacion.matriculacion.modelo.dominio.CicloFormativo;
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.Matricula;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.IMatriculas;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.mysql.utilidades.MySQL;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Clase que gestiona una colección de objetos Matricula utilizando un ArrayList.
  * Sustituye el uso de Arrays por ArrayLists, eliminando la necesidad de una capacidad fija.
  */
-public class Matriculas {
+public abstract class Matriculas implements IMatriculas {
     private ArrayList<Matricula> listaMatriculas;
     // Eliminados: atributos relacionados con capacidad fija
 
@@ -43,14 +40,14 @@ public class Matriculas {
     /**
      * Busca una matrícula por su ID.
      * @param idMatricula El ID de la matrícula a buscar.
-     * @return El objeto Matricula si se encuentra, o null si no existe.
+     * @return El objeto Matrícula si se encuentra, o null si no existe.
      */
     public Matricula buscarMatriculaPorId(String idMatricula) {
         if (idMatricula == null || idMatricula.trim().isEmpty()) {
             return null; // ID no válido para buscar
         }
         for (Matricula matricula : listaMatriculas) {
-            if (matricula.getIdMatricula().equalsIgnoreCase(idMatricula.trim())) {
+            if (matricula.getIdMatricula()) {
                 return matricula;
             }
         }
@@ -66,7 +63,7 @@ public class Matriculas {
         if (idMatricula == null || idMatricula.trim().isEmpty()) {
             return false; // ID no válido para eliminar
         }
-        return listaMatriculas.removeIf(matricula -> matricula.getIdMatricula().equalsIgnoreCase(idMatricula.trim()));
+        return listaMatriculas.removeIf(matricula -> matricula.getIdMatricula());
     }
 
     /**
@@ -127,5 +124,14 @@ public class Matriculas {
             }
         }
         return matriculasAsignatura;
+    }
+    @Override
+    public void comenzar() {
+        MySQL.establecerConexion(); // Necesitarás la clase MySQL
+    }
+
+    @Override
+    public void terminar() {
+        MySQL.cerrarConexion(); // Necesitarás la clase MySQL
     }
 }

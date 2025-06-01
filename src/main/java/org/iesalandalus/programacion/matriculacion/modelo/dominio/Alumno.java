@@ -8,7 +8,8 @@ import java.util.Objects;
 /**
  * Clase que representa a un alumno en el sistema.
  */
-public class Alumno {
+public class Alumno extends Asignatura {
+    private  int id;
     private String dni;
     private String nombre;
     private String apellidos;
@@ -23,6 +24,7 @@ public class Alumno {
      * @param fechaNacimiento La fecha de nacimiento del alumno.
      */
     public Alumno(String dni, String nombre, String apellidos, LocalDate fechaNacimiento) {
+        super();
         // Validación básica de parámetros no nulos
         if (dni == null || nombre == null || apellidos == null || fechaNacimiento == null) {
             throw new IllegalArgumentException("Todos los campos del alumno deben ser no nulos.");
@@ -32,6 +34,18 @@ public class Alumno {
         this.apellidos = apellidos;
         this.fechaNacimiento = fechaNacimiento;
     }
+
+    public Alumno(int id, String dni, String nombre, String apellidos) {
+        this.id = id;
+        this.dni = dni;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+    }
+
+    public Alumno(String dni, String nombre, String apellidos) {
+        this(0, dni, nombre, apellidos); // Llama al constructor de 4 argumentos para reutilizar código
+    }
+
 
     // --- Getters ---
     public String getDni() {

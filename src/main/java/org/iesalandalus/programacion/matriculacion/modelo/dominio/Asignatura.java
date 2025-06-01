@@ -1,6 +1,7 @@
 package org.iesalandalus.programacion.matriculacion.modelo.dominio;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * Clase que representa una asignatura en el sistema.
@@ -9,6 +10,9 @@ public class Asignatura {
     private String codigo;
     private String nombre;
     private int creditos;
+    private String descripcion;
+    private CicloFormativo curso;
+    private Asignatura EspecialidadProfesorado;
 
     /**
      * Constructor para crear un nuevo objeto Asignatura.
@@ -23,6 +27,20 @@ public class Asignatura {
         this.codigo = codigo;
         this.nombre = nombre;
         this.creditos = creditos;
+    }
+
+    public Asignatura() {
+        ResourceBundle rs = null;
+        String nombreAsignatura = rs.getString("nombre");
+        String descripcionAsignatura = rs.getString("descripcion");
+        Curso cursoTipoEnum = Curso.valueOf(rs.getString("columna_curso_en_bd")); // "DAW", "DAM", etc.
+        EspecialidadProfesorado especialidadEnum = EspecialidadProfesorado.valueOf(rs.getString("columna_especialidad_en_bd")); // "INFORMATICA", "MATEMATICAS", etc.
+
+        Asignatura nuevaAsignatura = new Asignatura();
+    }
+
+    private EspecialidadProfesorado valueOf(String columnaEspecialidadEnBd) {
+        return null;
     }
 
     // --- Getters ---
@@ -83,5 +101,17 @@ public class Asignatura {
     @Override
     public String toString() {
         return "Asignatura [Código: " + codigo + ", Nombre: " + nombre + ", Créditos: " + creditos + "]";
+    }
+    public String getDescripcion() {
+        return this.descripcion; // Devuelve el valor del atributo
+    }
+
+
+    public CicloFormativo getCurso() {
+        return this.curso;
+    }
+
+    public Asignatura getEspecialidadProfesorado() {
+        return this.EspecialidadProfesorado;
     }
 }

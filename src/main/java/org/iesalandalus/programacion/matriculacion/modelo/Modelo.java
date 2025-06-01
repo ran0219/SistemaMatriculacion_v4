@@ -1,6 +1,12 @@
 package org.iesalandalus.programacion.matriculacion.modelo;
 
 import org.iesalandalus.programacion.matriculacion.modelo.dominio.*;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.*;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria.Alumnos;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria.Asignaturas;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria.Matriculas;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria.CiclosFormativos;
+import org.iesalandalus.programacion.matriculacion.modelo.negocio.memoria.FuenteDatosMemoria;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,10 +23,17 @@ import java.util.Comparator;
 public class Modelo {
     // Declaración de las colecciones que almacenarán los datos.
     // Usamos ArrayList para gestionar dinámicamente el tamaño.
-    private final ArrayList<Alumno> listaAlumnos;
-    private final ArrayList<Asignatura> listaAsignaturas;
-    private final ArrayList<CicloFormativo> listaCiclosFormativos;
-    private final ArrayList<Matricula> listaMatriculas;
+    private ArrayList<Alumno> listaAlumnos;
+    private  ArrayList<Asignatura> listaAsignaturas;
+    private  ArrayList<CicloFormativo> listaCiclosFormativos;
+    private  ArrayList<Matricula> listaMatriculas;
+    private IFuenteDatos fuenteDatos;
+    private IAlumnos alumnos;
+    private ICiclosFormativos ciclosFormativos;
+    private IAsignaturas asignaturas;
+    private IMatriculas matriculas;
+
+
 
     // La constante CAPACIDAD ya NO es necesaria al usar ArrayLists.
 
@@ -279,7 +292,7 @@ public class Modelo {
      */
     public Matricula buscarMatricula(String idMatricula) {
         for (Matricula matricula : listaMatriculas) {
-            if (matricula.getIdMatricula().equalsIgnoreCase(idMatricula)) {
+            if (matricula.getIdMatricula()) {
                 return matricula;
             }
         }
@@ -292,7 +305,9 @@ public class Modelo {
      * @return true si la matrícula se eliminó con éxito, false si no se encontró.
      */
     public boolean eliminarMatricula(String idMatricula) {
-        return listaMatriculas.removeIf(matricula -> matricula.getIdMatricula().equalsIgnoreCase(idMatricula));
+        boolean eliminada = listaMatriculas.removeIf(matricula -> matricula.getIdMatricula());
+
+        return eliminada;
     }
 
     /**
@@ -376,5 +391,40 @@ public class Modelo {
 
     public void ordenarMatriculasPorId() {
         listaMatriculas.sort(Comparator.comparing(Matricula::getIdMatricula));
+    }
+
+    public void setFuenteDatos(IFuenteDatos fuenteDatos) {
+        this.fuenteDatos = fuenteDatos;
+    }
+    public Modelo(IFuenteDatos fuenteDatos) {
+        this.fuenteDatos = fuenteDatos;
+        // Las colecciones se inicializan en comenzar(), no aquí
+    }
+    public void comenzar() {
+        // Inicializar las colecciones usando la fuente de datos
+        this.alumnos = fuenteDatos.crearAlumnos();
+        this.ciclosFormativos = fuenteDatos.crearCiclosFormativos();
+        this.asignaturas = fuenteDatos.crearAsignaturas();
+        this.matriculas = fuenteDatos.crearMatriculas();
+
+        // Llamar a comenzar() en cada colección
+        if (this.alumnos != null) this.alumnos.comenzar();
+        if (this.ciclosFormativos != null) this.ciclosFormativos.comenzar();
+        if (this.asignaturas != null) this.asignaturas.comenzar();
+        if (this.matriculas != null) this.matriculas.comenzar();
+    }
+
+    public void terminar() {
+        // Llamar a terminar() en cada colección
+        if (this.alumnos != null) this.alumnos.terminar();
+        if (this.ciclosFormativos != null) this.ciclosFormativos.terminar();
+        if (this.asignaturas != null) this.asignaturas.terminar();
+        if (this.matriculas != null) this.matriculas.terminar();
+    }
+
+    public void añadirAsignaturaAMatricula(Matricula mat2, Asignatura prog) {
+    }
+
+    public void añadirMatricula(Matricula mat3) {
     }
 }
